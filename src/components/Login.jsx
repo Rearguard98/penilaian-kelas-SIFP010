@@ -9,7 +9,7 @@ export default function Login({ handleLogin, nim, setNim, password, setPassword,
           <img 
             src="/logo-nilai-login-web-kelas.png" 
             alt="Logo Kelas" 
-            className="mx-auto h-20 w-auto mb-4 drop-shadow-md" 
+            className="mx-auto h-20 w-auto mb-4 drop-shadow-md rounded-full" 
           />
           <h2 className="text-2xl font-bold text-white tracking-wide">Login Akademik</h2>
           <p className="text-blue-100 text-sm mt-2">Dosen & Mahasiswa</p>

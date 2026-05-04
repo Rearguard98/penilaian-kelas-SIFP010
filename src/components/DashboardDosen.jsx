@@ -1,4 +1,5 @@
 import { DAFTAR_KATEGORI } from '../utils/constants';
+import UbahPassword from './UbahPassword';
 
 export default function DashboardDosen({ 
   daftarMahasiswa, kategoriPilihan, setKategoriPilihan, 
@@ -102,6 +103,7 @@ export default function DashboardDosen({
             </table>
           </div>
         </div>
+        <UbahPassword/>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import UbahPassword from './UbahPassword';
+
 export default function DashboardMahasiswa({ daftarNilai, handleLogout }) {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans text-gray-800">
@@ -45,6 +47,7 @@ export default function DashboardMahasiswa({ daftarNilai, handleLogout }) {
             </table>
           </div>
         </div>
+        <UbahPassword/>
       </div>
     </div>
   );

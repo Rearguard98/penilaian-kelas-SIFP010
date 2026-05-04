@@ -100,6 +100,39 @@ export default {
         return new Response(JSON.stringify({ pesan: "Nilai berhasil disimpan!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
+      // ==========================================
+      // 5. MENGGANTI PASSWORD PENGGUNA
+      // ==========================================
+      if (url.pathname === "/ubah-password" && request.method === "POST") {
+        const authHeader = request.headers.get("Authorization");
+        if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
+        
+        const token = authHeader.split(" ")[1];
+        if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
+        
+        const { payload } = jwt.decode(token);
+        const body = await request.json();
+        const { passwordLama, passwordBaru } = body;
+
+        // 1. Cari data user berdasarkan token NIM yang sedang login
+        const { results } = await env.DB.prepare("SELECT * FROM users WHERE nim = ?").bind(payload.nim).all();
+        if (results.length === 0) return new Response(JSON.stringify({ error: "Pengguna tidak ditemukan" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        
+        const user = results[0];
+
+        // 2. Verifikasi apakah password lamanya benar
+        const isPasswordValid = await bcrypt.compare(passwordLama, user.password_hash);
+        if (!isPasswordValid) return new Response(JSON.stringify({ error: "Password lama salah!" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+        // 3. Hash password yang baru
+        const hashBaru = await bcrypt.hash(passwordBaru, 10);
+
+        // 4. Update data di database D1
+        await env.DB.prepare("UPDATE users SET password_hash = ? WHERE nim = ?").bind(hashBaru, payload.nim).run();
+
+        return new Response(JSON.stringify({ pesan: "Password berhasil diperbarui!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      
       return new Response("Not Found", { status: 404, headers: corsHeaders });
       
     } catch (error) {

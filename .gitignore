@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+generate-data.mjs
+data-kelas-otomatis.sql
+data-kelas.sql
+tambah-mahasiswa.mjs
+data-tambahan.sql

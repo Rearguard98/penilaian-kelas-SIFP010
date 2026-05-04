@@ -2,7 +2,15 @@ export default function Login({ handleLogin, nim, setNim, password, setPassword,
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 font-sans text-gray-800">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-50">
+        
+        {/* --- BAGIAN HEADER YANG DIUBAH --- */}
         <div className="bg-blue-700 p-6 text-center">
+          {/* Memanggil gambar dari folder public */}
+          <img 
+            src="/logo-nilai-login-web-kelas.png" 
+            alt="Logo Kelas" 
+            className="mx-auto h-20 w-auto mb-4 drop-shadow-md" 
+          />
           <h2 className="text-2xl font-bold text-white tracking-wide">Login Akademik</h2>
           <p className="text-blue-100 text-sm mt-2">Dosen & Mahasiswa</p>
         </div>

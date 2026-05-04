@@ -1,5 +1,6 @@
 import { DAFTAR_KATEGORI } from '../utils/constants';
 import UbahPassword from './UbahPassword';
+import FotoProfil from './FotoProfil';
 
 export default function DashboardDosen({ 
   daftarMahasiswa, kategoriPilihan, setKategoriPilihan, 
@@ -18,6 +19,8 @@ export default function DashboardDosen({
             Logout
           </button>
         </div>
+
+        <FotoProfil/>
 
         <div className="p-6">
           {/* Filter Pemilihan Pertemuan */}

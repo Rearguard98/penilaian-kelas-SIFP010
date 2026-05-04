@@ -132,7 +132,43 @@ export default {
 
         return new Response(JSON.stringify({ pesan: "Password berhasil diperbarui!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      
+
+      // ==========================================
+      // 6. AMBIL DATA PROFIL PENGGUNA
+      // ==========================================
+      if (url.pathname === "/profil" && request.method === "GET") {
+        const authHeader = request.headers.get("Authorization");
+        if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
+        
+        const token = authHeader.split(" ")[1];
+        if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
+        
+        const { payload } = jwt.decode(token);
+        
+        const { results } = await env.DB.prepare("SELECT nim, nama_lengkap, foto_profil FROM users WHERE nim = ?").bind(payload.nim).all();
+        
+        return new Response(JSON.stringify(results[0]), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // ==========================================
+      // 7. UPLOAD FOTO PROFIL (BASE64)
+      // ==========================================
+      if (url.pathname === "/profil/foto" && request.method === "POST") {
+        const authHeader = request.headers.get("Authorization");
+        if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
+        
+        const token = authHeader.split(" ")[1];
+        if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
+        
+        const { payload } = jwt.decode(token);
+        const body = await request.json();
+        
+        // Simpan teks Base64 gambar ke database
+        await env.DB.prepare("UPDATE users SET foto_profil = ? WHERE nim = ?").bind(body.fotoBase64, payload.nim).run();
+
+        return new Response(JSON.stringify({ pesan: "Foto berhasil diperbarui!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
       return new Response("Not Found", { status: 404, headers: corsHeaders });
       
     } catch (error) {

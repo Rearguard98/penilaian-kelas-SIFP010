@@ -1,4 +1,5 @@
 import UbahPassword from './UbahPassword';
+import FotoProfil from './FotoProfil';
 
 export default function DashboardMahasiswa({ daftarNilai, handleLogout }) {
   return (
@@ -13,6 +14,8 @@ export default function DashboardMahasiswa({ daftarNilai, handleLogout }) {
             Logout
           </button>
         </div>
+
+        <FotoProfil/>
 
         <div className="p-4 sm:p-8">
           <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">

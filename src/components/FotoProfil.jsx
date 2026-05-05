@@ -102,7 +102,7 @@ export default function FotoProfil() {
       
       {/* --- BAGIAN AVATAR FOTO --- */}
       <div className="relative">
-        <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-blue-500 bg-gray-100 flex-shrink-0">
+        <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-blue-500 bg-gray-100 shrink-0">
           {profil.foto_profil ? (
             <img src={profil.foto_profil} alt="Profil" className="h-full w-full object-cover" />
           ) : (

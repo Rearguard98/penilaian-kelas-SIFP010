@@ -22,7 +22,7 @@ export default {
       if (url.pathname === "/login" && request.method === "POST") {
         const body = await request.json();
         const { nim, password } = body;
-        
+
         const { results } = await env.DB.prepare("SELECT * FROM users WHERE nim = ?").bind(nim).all();
 
         // Jika NIM tidak ditemukan
@@ -46,15 +46,15 @@ export default {
       }
 
       // ==========================================
-      // 2. AMBIL DATA NILAI 
+      // 2. AMBIL DATA NILAI
       // ==========================================
       if (url.pathname === "/nilai" && request.method === "GET") {
         const authHeader = request.headers.get("Authorization");
         if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
-        
+
         const token = authHeader.split(" ")[1];
         if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
-        
+
         const { payload } = jwt.decode(token);
 
         if (payload.role === 'dosen') {
@@ -84,15 +84,15 @@ export default {
       // ==========================================
       if (url.pathname === "/nilai" && request.method === "POST") {
         const body = await request.json();
-        const { kategori, dataNilai } = body; 
+        const { kategori, dataNilai } = body;
 
         await env.DB.prepare("DELETE FROM grades WHERE kategori = ?").bind(kategori).run();
 
-        const stmts = dataNilai.map(mhs => 
+        const stmts = dataNilai.map(mhs =>
           env.DB.prepare("INSERT INTO grades (nim_mahasiswa, kategori, skor, catatan) VALUES (?, ?, ?, ?)")
             .bind(mhs.nim, kategori, mhs.skor, mhs.catatan || "")
         );
-        
+
         if(stmts.length > 0) {
           await env.DB.batch(stmts);
         }
@@ -106,10 +106,10 @@ export default {
       if (url.pathname === "/ubah-password" && request.method === "POST") {
         const authHeader = request.headers.get("Authorization");
         if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
-        
+
         const token = authHeader.split(" ")[1];
         if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
-        
+
         const { payload } = jwt.decode(token);
         const body = await request.json();
         const { passwordLama, passwordBaru } = body;
@@ -117,7 +117,7 @@ export default {
         // 1. Cari data user berdasarkan token NIM yang sedang login
         const { results } = await env.DB.prepare("SELECT * FROM users WHERE nim = ?").bind(payload.nim).all();
         if (results.length === 0) return new Response(JSON.stringify({ error: "Pengguna tidak ditemukan" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        
+
         const user = results[0];
 
         // 2. Verifikasi apakah password lamanya benar
@@ -139,14 +139,14 @@ export default {
       if (url.pathname === "/profil" && request.method === "GET") {
         const authHeader = request.headers.get("Authorization");
         if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
-        
+
         const token = authHeader.split(" ")[1];
         if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
-        
+
         const { payload } = jwt.decode(token);
-        
+
         const { results } = await env.DB.prepare("SELECT nim, nama_lengkap, foto_profil FROM users WHERE nim = ?").bind(payload.nim).all();
-        
+
         return new Response(JSON.stringify(results[0]), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
@@ -156,21 +156,46 @@ export default {
       if (url.pathname === "/profil/foto" && request.method === "POST") {
         const authHeader = request.headers.get("Authorization");
         if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
-        
+
         const token = authHeader.split(" ")[1];
         if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
-        
+
         const { payload } = jwt.decode(token);
         const body = await request.json();
-        
+
         // Simpan teks Base64 gambar ke database
         await env.DB.prepare("UPDATE users SET foto_profil = ? WHERE nim = ?").bind(body.fotoBase64, payload.nim).run();
 
         return new Response(JSON.stringify({ pesan: "Foto berhasil diperbarui!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
+			// ==========================================
+      // 8. UBAH NAMA PENGGUNA (INLINE EDITING)
+      // ==========================================
+      if (url.pathname === "/ubah-nama" && request.method === "POST") {
+        const authHeader = request.headers.get("Authorization");
+        if (!authHeader) return new Response("Akses ditolak", { status: 401, headers: corsHeaders });
+
+        const token = authHeader.split(" ")[1];
+        if (!(await jwt.verify(token, "KUNCI_RAHASIA_KAMPUS_123"))) return new Response("Token tidak valid", { status: 401, headers: corsHeaders });
+
+        const { payload } = jwt.decode(token);
+        const body = await request.json();
+        const { namaBaru } = body;
+
+        // Validasi: Cegah user mengosongkan namanya
+        if (!namaBaru || namaBaru.trim() === "") {
+          return new Response(JSON.stringify({ error: "Nama tidak boleh kosong!" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        // Update HANYA kolom nama_lengkap berdasarkan NIM yang sedang login (Payload Token)
+        await env.DB.prepare("UPDATE users SET nama_lengkap = ? WHERE nim = ?").bind(namaBaru, payload.nim).run();
+
+        return new Response(JSON.stringify({ pesan: "Nama berhasil diperbarui!" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
       return new Response("Not Found", { status: 404, headers: corsHeaders });
-      
+
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
     }

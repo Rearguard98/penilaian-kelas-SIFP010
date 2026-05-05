@@ -6,6 +6,7 @@ export default function UbahPassword() {
   const [konfirmasi, setKonfirmasi] = useState('');
   const [pesan, setPesan] = useState(null);
   const [status, setStatus] = useState(''); // 'sukses' atau 'error'
+  const [showSemuaPassword, setShowSemuaPassword] = useState(false);
 
   const handleUbahPassword = async (e) => {
     e.preventDefault();
@@ -61,22 +62,47 @@ export default function UbahPassword() {
       <form onSubmit={handleUbahPassword} className="space-y-4">
         <div>
           <label className="block text-sm text-gray-600 mb-1">Password Lama</label>
-          <input type="password" required value={passwordLama} onChange={(e) => setPasswordLama(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input 
+            type={showSemuaPassword ? "text" : "password"} // Diubah dinamis
+            required value={passwordLama} onChange={(e) => setPasswordLama(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Password Baru</label>
-            <input type="password" required value={passwordBaru} onChange={(e) => setPasswordBaru(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input 
+              type={showSemuaPassword ? "text" : "password"} // Diubah dinamis
+              required value={passwordBaru} onChange={(e) => setPasswordBaru(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Konfirmasi Password Baru</label>
-            <input type="password" required value={konfirmasi} onChange={(e) => setKonfirmasi(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input 
+              type={showSemuaPassword ? "text" : "password"} // Diubah dinamis
+              required value={konfirmasi} onChange={(e) => setKonfirmasi(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            />
           </div>
         </div>
-        <button type="submit" className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900 transition text-sm font-semibold">
+
+        {/* --- FITUR CHECKBOX TAMPILKAN PASSWORD --- */}
+        <div className="flex items-center mt-2">
+          <input
+            type="checkbox"
+            id="showPass"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+            checked={showSemuaPassword}
+            onChange={() => setShowSemuaPassword(!showSemuaPassword)}
+          />
+          <label htmlFor="showPass" className="ml-2 block text-sm text-gray-600 cursor-pointer">
+            Tampilkan semua password
+          </label>
+        </div>
+        {/* --------------------------------------- */}
+
+        <button type="submit" className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900 transition text-sm font-semibold mt-4">
           Simpan Password Baru
         </button>
       </form>

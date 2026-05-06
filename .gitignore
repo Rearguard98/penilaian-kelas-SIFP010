@@ -24,7 +24,5 @@ dist-ssr
 *.sw?
 
 generate-data.mjs
-data-kelas-otomatis.sql
-data-kelas.sql
 tambah-mahasiswa.mjs
-data-tambahan.sql
+*.sql
